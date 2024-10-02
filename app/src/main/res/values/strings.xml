@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">HiPermission</string>
+    <string name="app_name" translatable="false">HiPermission</string>
     <string name="muti_permission_default_style">Mutl Permission(Default Style With Fade)</string>
     <string name="muti_permission_blue_style">Mutl Permission(Blue Style With Scale)</string>
     <string name="muti_permission_green_style">Mutl Permission(Green Style With Modal)</string>
