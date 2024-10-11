@@ -1,15 +1,15 @@
 apply plugin: 'com.android.library'
-apply plugin: 'com.github.dcendents.android-maven'
-apply plugin: 'com.jfrog.bintray'
+apply plugin: 'maven-publish'
+//apply plugin: 'com.simpligility.maven.plugins.android-maven'
+//apply plugin: 'com.jfrog.bintray'
 android {
+    namespace "me.weyye.hipermission"
+
     compileSdkVersion rootProject.ext.compileVersion
-    buildToolsVersion rootProject.ext.buildToolsVersion
 
     defaultConfig {
         minSdkVersion rootProject.ext.minSdk
         targetSdkVersion rootProject.ext.targetSdk
-        versionCode rootProject.ext.version_code
-        versionName rootProject.ext.version_name
 
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
@@ -20,18 +20,25 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
-	lintOptions {
-		abortOnError false
-	}
+    lint {
+        abortOnError false
+    }
+    publishing {
+        singleVariant('release') {
+            withSourcesJar()
+        }
+    }
 }
 
 dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
-    androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation 'androidx.appcompat:appcompat:1.7.0'
+    androidTestImplementation('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
-    compile "com.android.support:appcompat-v7:${rootProject.ext.supportVersion}"
-    testCompile 'junit:junit:4.12'
+    //implementation "com.android.support:appcompat-v7:${rootProject.ext.supportVersion}"
+    implementation "androidx.core:core:1.13.1"
+    testImplementation 'junit:junit:4.13.2'
 }
 
 //项目主页
@@ -50,7 +57,8 @@ version = rootProject.ext.version_name
 //生成源文件
 task sourcesJar(type: Jar) {
     from android.sourceSets.main.java.srcDirs
-    classifier = 'sources'
+    archiveClassifier = 'sources'
+    //classifier = 'sources'
 }
 
 //生成Javadoc文档
@@ -61,7 +69,8 @@ task javadoc(type: Javadoc) {
 
 //文档打包成jar
 task javadocJar(type: Jar, dependsOn: javadoc) {
-    classifier = 'javadoc'
+    //classifier = 'javadoc'
+    archiveClassifier = 'javadoc'
     from javadoc.destinationDir
 }
 
@@ -78,6 +87,7 @@ artifacts {
 }
 
 // 配置maven库，生成POM.xml文件
+/*
 install {
     repositories.mavenInstaller {
         // This generates POM.xml with proper parameters
@@ -111,28 +121,7 @@ install {
         }
     }
 }
-
-//上传到JCenter
-Properties properties = new Properties()
-//properties.load(project.rootProject.file('local.properties').newDataInputStream())
-
-bintray {
-    user = properties.getProperty("bintray.user")    //读取 local.properties 文件里面的 bintray.user
-    key = properties.getProperty("bintray.apikey")   //读取 local.properties 文件里面的 bintray.apikey
-    configurations = ['archives']
-    pkg {
-        //这里的repo值必须要和你创建Maven仓库的时候的名字一样
-        repo = "maven"
-        //发布到JCenter上的项目名字
-        name = libName
-        //项目描述
-        desc = '一个简单易用的漂亮的权限申请库'
-        websiteUrl = siteUrl
-        vcsUrl = gitUrl
-        licenses = ["Apache-2.0"]
-        publish = true
-    }
-}
+*/
 
 javadoc {
     options{
@@ -142,5 +131,25 @@ javadoc {
         author true
         version true
         links "http://docs.oracle.com/javase/7/docs/api"
+    }
+}
+
+publishing {
+    publications {
+        release(MavenPublication) {
+            groupId = 'me.weyye.hipermission'
+            artifactId = 'library'
+            version = '2.0.7'
+
+            afterEvaluate {
+                from components.release
+            }
+        }
+    }
+    repositories {
+        maven {
+            name = 'myrepo'
+            url = layout.buildDirectory.dir("repo")
+        }
     }
 }
